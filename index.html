@@ -1,21 +1,21 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { 
-            margin: 0; padding: 0; background: transparent; 
-            display: flex; justify-content: center; align-items: flex-start;
-            font-family: 'Inter', -apple-system, sans-serif;
-        }
+        body { margin: 0; padding: 0; background: transparent; display: flex; justify-content: center; align-items: flex-start; font-family: 'Inter', -apple-system, sans-serif; }
         
         #surgical-upload-node { 
             background: #ffffff; border: 1px solid #3351d6; padding: 40px; 
-            width: 90%; max-width: 420px; margin: 20px auto; 
+            width: 95%; max-width: 420px; margin: 20px auto; 
             text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,0.05);
-            box-sizing: border-box;
+            box-sizing: border-box; transition: transform 0.3s ease;
         }
+
+        /* SHAKE ANIMATION FOR ERRORS */
+        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
 
         .node-header { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 30px; }
         .signal-indicator { width: 6px; height: 6px; background: #9c27b0; border-radius: 50%; box-shadow: 0 0 10px #9c27b0; animation: pulse 1.5s infinite; }
@@ -30,26 +30,19 @@
         }
         textarea { resize: none; text-transform: none; border-left: 3px solid #eee; }
 
-        /* HIGH-END VALIDATION STYLES */
-        /* Only turns red if there is text AND it's invalid */
-        input:not(:placeholder-shown):invalid { border: 1px solid #ff0000 !important; background: #fff8f8; }
-        input:not(:placeholder-shown):invalid + .error-label { display: block; }
+        /* SURGICAL VISUAL FEEDBACK */
+        .is-invalid { border: 1px solid #ff0000 !important; background: #fff8f8; }
+        .is-valid { border: 1px solid #3351d6 !important; }
 
-        .error-label { 
-            display: none; font-size: 8px; color: #ff0000; font-weight: 800; 
-            letter-spacing: 1px; margin-top: 4px; line-height: 1.4;
-        }
+        .error-label { display: none; font-size: 8px; color: #ff0000; font-weight: 800; letter-spacing: 1px; margin-top: 4px; }
+        .is-invalid + .error-label { display: block; }
 
-        /* THE ACTION BUTTON */
         .action-btn { 
             background: #ccc; color: #fff; border: none; padding: 18px; font-size: 11px; font-weight: 700; 
-            letter-spacing: 2px; cursor: not-allowed; width: 100%; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
-            opacity: 0.5;
+            letter-spacing: 2px; cursor: not-allowed; width: 100%; transition: 0.4s; opacity: 0.5;
         }
-
-        /* Form is valid? Unlock button */
-        #ui-form:valid .action-btn { background: #111; opacity: 1; cursor: pointer; }
-        #ui-form:valid .action-btn:hover { background: #3351d6; transform: translateY(-2px); }
+        .action-btn.active { background: #111; opacity: 1; cursor: pointer; }
+        .action-btn.active:hover { background: #3351d6; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(51, 81, 214, 0.2); }
 
         .instruction-text { font-size: 8px; letter-spacing: 1px; color: #aaa; margin-bottom: 15px; font-weight: 600; }
         #ui-success { display: none; padding: 20px 0; }
@@ -65,30 +58,22 @@
             <span class="status-text">PROJECT UPLINK NODE</span>
         </div>
 
-        <form id="ui-form" onsubmit="return false;">
+        <form id="ui-form" autocomplete="off">
             <div class="input-group">
                 <input type="text" id="client-name" placeholder="ARTIST NAME" required>
-                
                 <div class="field-wrap">
-                    <input type="email" id="client-email" 
-                           pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-                           placeholder="EMAIL ADDRESS" required title="Please enter a valid email (e.g., name@domain.com)">
-                    <span class="error-label">INVALID EMAIL: REQUIRES @ AND .DOMAIN</span>
+                    <input type="text" id="client-email" placeholder="EMAIL ADDRESS" required>
+                    <span class="error-label">STRICT FORMAT: NAME@DOMAIN.COM</span>
                 </div>
-
                 <input type="text" id="song-title" placeholder="SONG TITLE" required>
-                
                 <div class="field-wrap">
-                    <input type="url" id="stems-link" 
-                           pattern="https?://[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}.*"
-                           placeholder="PASTE STEMS LINK (HTTPS://...)" required>
-                    <span class="error-label">MISSING HTTPS:// OR VALID .DOMAIN</span>
+                    <input type="text" id="stems-link" placeholder="PASTE STEMS LINK (HTTPS://...)" required>
+                    <span class="error-label">MUST START WITH HTTPS:// AND CONTAIN .DOMAIN</span>
                 </div>
-
                 <textarea id="mix-notes" placeholder="MIX NOTES / REFERENCES / INSTRUCTIONS" rows="4"></textarea>
             </div>
             <p class="instruction-text">UPLINK TEXT DATA TO STUDIO SERVER</p>
-            <button onclick="submitProject()" id="submit-btn" class="action-btn">INITIALIZE PROJECT</button>
+            <button type="button" id="submit-btn" class="action-btn" disabled>INITIALIZE PROJECT</button>
         </form>
     </div>
 
@@ -100,16 +85,59 @@
 
 <script>
     const SCRIPT_URL = 'YOUR_WEB_APP_URL_HERE';
+    
+    const node = document.getElementById('surgical-upload-node');
+    const email = document.getElementById('client-email');
+    const link = document.getElementById('stems-link');
+    const btn = document.getElementById('submit-btn');
+    const inputs = document.querySelectorAll('input[required]');
 
-    function submitProject() {
-        const btn = document.getElementById('submit-btn');
-        btn.innerText = "SYNCING...";
+    // Surgical Regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,6}$/;
+    const linkRegex = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
+
+    function runValidation() {
+        // Auto-trim spaces for clean data
+        const emailVal = email.value.trim();
+        const linkVal = link.value.trim();
+
+        const isEmailValid = emailRegex.test(emailVal);
+        const isLinkValid = linkRegex.test(linkVal);
+        let allFilled = true;
+        inputs.forEach(i => { if(!i.value.trim()) allFilled = false; });
+
+        // Visual states
+        email.classList.toggle('is-invalid', emailVal !== "" && !isEmailValid);
+        email.classList.toggle('is-valid', isEmailValid);
+        
+        link.classList.toggle('is-invalid', linkVal !== "" && !isLinkValid);
+        link.classList.toggle('is-valid', isLinkValid);
+
+        if (isEmailValid && isLinkValid && allFilled) {
+            btn.classList.add('active');
+            btn.disabled = false;
+        } else {
+            btn.classList.remove('active');
+            btn.disabled = true;
+        }
+    }
+
+    document.getElementById('ui-form').addEventListener('input', runValidation);
+
+    btn.addEventListener('click', () => {
+        if(btn.disabled) {
+            node.classList.add('shake');
+            setTimeout(() => node.classList.remove('shake'), 400);
+            return;
+        }
+
+        btn.innerText = "UPLINKING SIGNAL...";
         btn.disabled = true;
 
         const data = {
-            name: document.getElementById('client-name').value + "_" + document.getElementById('song-title').value,
-            clientEmail: document.getElementById('client-email').value,
-            stemsLink: document.getElementById('stems-link').value,
+            name: document.getElementById('client-name').value.trim() + "_" + document.getElementById('song-title').value.trim(),
+            clientEmail: email.value.trim(),
+            stemsLink: link.value.trim(),
             clientNotes: document.getElementById('mix-notes').value
         };
 
@@ -119,12 +147,11 @@
             document.getElementById('ui-success').style.display = 'block';
         })
         .catch(() => {
-            alert("SIGNAL ERROR. CHECK CONNECTION.");
+            alert("SIGNAL LOST. CHECK CONNECTION.");
             btn.innerText = "INITIALIZE PROJECT";
             btn.disabled = false;
         });
-    }
+    });
 </script>
-
 </body>
 </html>

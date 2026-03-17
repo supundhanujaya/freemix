@@ -4,19 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { margin: 0; padding: 0; background: transparent; overflow: hidden; }
+        /* Ensures the background is clean for the embed */
+        body { 
+            margin: 0; 
+            padding: 0; 
+            background: transparent; 
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            font-family: 'Inter', -apple-system, sans-serif;
+        }
         
         #surgical-upload-node { 
             background: #ffffff; 
             border: 1px solid #3351d6; 
             padding: 40px; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            text-align: center;
+            /* FIXED WIDTH LOGIC */
+            width: 90%; 
+            max-width: 420px; 
+            margin: 20px auto; 
+            text-align: center; 
+            box-shadow: 0 30px 60px rgba(0,0,0,0.05);
+            box-sizing: border-box;
         }
 
         .node-header { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 30px; }
-        .signal-indicator { width: 6px; height: 6px; background: #9c27b0; border-radius: 50%; box-shadow: 0 0 10px #9c27b0; animation: pulse 1.5s infinite; }
-        .status-text { font-size: 10px; letter-spacing: 3px; color: #111; font-weight: 800; text-transform: uppercase; }
+        .signal-indicator { width: 6px; height: 6px; background: #9c27b0; border-radius: 50%; box-shadow: 0 0 10px #9c27b0; animation: p 1.5s infinite; }
+        .status-text { font-size: 10px; letter-spacing: 3px; color: #111; font-weight: 800; }
         
         .input-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
         .field-wrap { position: relative; text-align: left; }
@@ -27,9 +42,9 @@
         }
         textarea { resize: none; text-transform: none; border-left: 3px solid #eee; }
 
-        /* VALIDATION LOGIC */
-        input:not(:placeholder-shown):invalid { border: 1px solid #ff0000 !important; }
-        input:not(:placeholder-shown):invalid + .error-label { display: block; }
+        /* SURGICAL VALIDATION */
+        .validate-field:not(:placeholder-shown):invalid { border: 1px solid #ff0000 !important; }
+        .validate-field:not(:placeholder-shown):invalid + .error-label { display: block; }
         .error-label { display: none; font-size: 8px; color: #ff0000; font-weight: 800; letter-spacing: 1px; margin-top: 4px; }
 
         /* THE SMART BUTTON */
@@ -38,14 +53,15 @@
             letter-spacing: 2px; cursor: not-allowed; width: 100%; transition: 0.3s; opacity: 0.5;
         }
 
+        /* Activates button when form is valid */
         #ui-form:valid .action-btn { background: #111; opacity: 1; cursor: pointer; }
-        #ui-form:valid .action-btn:hover { background: #3351d6; transform: translateY(-2px); }
+        #ui-form:valid .action-btn:hover { background: #3351d6; }
 
         .instruction-text { font-size: 8px; letter-spacing: 1px; color: #aaa; margin-bottom: 15px; font-weight: 600; }
         
-        #ui-success { display: none; padding: 40px 0; }
+        #ui-success { display: none; padding: 20px 0; }
 
-        @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+        @keyframes p { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -57,30 +73,30 @@
             <span class="status-text">PROJECT UPLINK NODE</span>
         </div>
 
-        <form id="ui-form">
+        <form id="ui-form" onsubmit="return false;">
             <div class="input-group">
                 <input type="text" id="client-name" placeholder="ARTIST NAME" required>
                 
                 <div class="field-wrap">
-                    <input type="email" id="client-email" 
+                    <input type="email" id="client-email" class="validate-field" 
                            pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
                            placeholder="EMAIL ADDRESS" required>
-                    <span class="error-label">INVALID EMAIL (NAME@DOMAIN.COM)</span>
+                    <span class="error-label">INVALID EMAIL FORMAT</span>
                 </div>
 
                 <input type="text" id="song-title" placeholder="SONG TITLE" required>
                 
                 <div class="field-wrap">
-                    <input type="url" id="stems-link" 
+                    <input type="url" id="stems-link" class="validate-field" 
                            pattern="https?://.*?\..*?" 
                            placeholder="PASTE STEMS LINK (HTTPS://...)" required>
-                    <span class="error-label">PROVIDE FULL URL (MUST INCLUDE .DOMAIN)</span>
+                    <span class="error-label">PROVIDE FULL URL (EX: HTTPS://...)</span>
                 </div>
 
                 <textarea id="mix-notes" placeholder="MIX NOTES / REFERENCES / INSTRUCTIONS" rows="4"></textarea>
             </div>
-            <p class="instruction-text">INITIALIZE CONNECTION TO STUDIO DRIVE</p>
-            <button type="submit" id="submit-btn" class="action-btn">INITIALIZE PROJECT</button>
+            <p class="instruction-text">UPLINK TEXT DATA TO STUDIO SERVER</p>
+            <button onclick="submitProject()" id="submit-btn" class="action-btn">INITIALIZE PROJECT</button>
         </form>
     </div>
 
@@ -91,10 +107,9 @@
 </div>
 
 <script>
-    const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL';
+    const SCRIPT_URL = 'YOUR_WEB_APP_URL_HERE';
 
-    document.getElementById('ui-form').addEventListener('submit', function(e) {
-        e.preventDefault();
+    function submitProject() {
         const btn = document.getElementById('submit-btn');
         btn.innerText = "SYNCING...";
         btn.disabled = true;
@@ -116,7 +131,7 @@
             btn.innerText = "INITIALIZE PROJECT";
             btn.disabled = false;
         });
-    });
+    }
 </script>
 
 </body>

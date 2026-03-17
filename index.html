@@ -134,12 +134,14 @@
         btn.innerText = "UPLINKING SIGNAL...";
         btn.disabled = true;
 
-        const data = {
-            name: document.getElementById('client-name').value.trim() + "_" + document.getElementById('song-title').value.trim(),
-            clientEmail: email.value.trim(),
-            stemsLink: link.value.trim(),
-            clientNotes: document.getElementById('mix-notes').value
-        };
+   const data = {
+    // Keep these separate so the Apps Script can use them individually
+    name: document.getElementById('client-name').value.trim(),
+    songTitle: document.getElementById('song-title').value.trim(),
+    clientEmail: email.value.trim(),
+    stemsLink: link.value.trim(),
+    clientNotes: document.getElementById('mix-notes').value
+};
 
         fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) })
         .then(() => {

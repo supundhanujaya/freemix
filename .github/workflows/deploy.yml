@@ -4,14 +4,14 @@ on:
   push:
     branches: ["main"]
 
-# Forces the entire runner to use Node 24 for every step
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 permissions:
   contents: read
   pages: write
   id-token: write
+
+# Force Node 24 at the top level
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   deploy:
@@ -21,14 +21,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.2.2 # Check for the most recent patch
+        uses: actions/checkout@v4
 
       - name: Setup Pages
-        uses: actions/configure-pages@v5 # Upgraded to v5
+        uses: actions/configure-pages@v5
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3.0.1
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # This tells GitHub to look specifically in the root directory
+          path: './' 
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4.0.5
+        uses: actions/deploy-pages@v4

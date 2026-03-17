@@ -44,6 +44,10 @@
         .action-btn.active { background: #111; opacity: 1; cursor: pointer; }
         .action-btn.active:hover { background: #3351d6; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(51, 81, 214, 0.2); }
 
+        /* PROCESSING & SUCCESS STATES */
+        .action-btn.processing { background: #444 !important; color: #888 !important; cursor: wait; opacity: 1; }
+        .action-btn.success { background: #00ff88 !important; color: #111 !important; border-color: #00ff88 !important; opacity: 1; }
+
         .instruction-text { font-size: 8px; letter-spacing: 1px; color: #aaa; margin-bottom: 15px; font-weight: 600; }
         #ui-success { display: none; padding: 20px 0; }
         @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
@@ -92,12 +96,10 @@
     const btn = document.getElementById('submit-btn');
     const inputs = document.querySelectorAll('input[required]');
 
-    // Surgical Regex
     const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,6}$/;
     const linkRegex = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
 
     function runValidation() {
-        // Auto-trim spaces for clean data
         const emailVal = email.value.trim();
         const linkVal = link.value.trim();
 
@@ -106,7 +108,6 @@
         let allFilled = true;
         inputs.forEach(i => { if(!i.value.trim()) allFilled = false; });
 
-        // Visual states
         email.classList.toggle('is-invalid', emailVal !== "" && !isEmailValid);
         email.classList.toggle('is-valid', isEmailValid);
         
@@ -131,26 +132,35 @@
             return;
         }
 
+        // --- START STATUS UPDATE LOGIC ---
         btn.innerText = "UPLINKING SIGNAL...";
+        btn.classList.add('processing');
         btn.disabled = true;
 
-   const data = {
-    // Keep these separate so the Apps Script can use them individually
-    name: document.getElementById('client-name').value.trim(),
-    songTitle: document.getElementById('song-title').value.trim(),
-    clientEmail: email.value.trim(),
-    stemsLink: link.value.trim(),
-    clientNotes: document.getElementById('mix-notes').value
-};
+        const data = {
+            name: document.getElementById('client-name').value.trim(),
+            songTitle: document.getElementById('song-title').value.trim(),
+            clientEmail: email.value.trim(),
+            stemsLink: link.value.trim(),
+            clientNotes: document.getElementById('mix-notes').value
+        };
 
         fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) })
         .then(() => {
-            document.getElementById('ui-container').style.display = 'none';
-            document.getElementById('ui-success').style.display = 'block';
+            // Update button to success state before switching screens
+            btn.innerText = "SIGNAL RECEIVED";
+            btn.classList.remove('processing');
+            btn.classList.add('success');
+
+            setTimeout(() => {
+                document.getElementById('ui-container').style.display = 'none';
+                document.getElementById('ui-success').style.display = 'block';
+            }, 1200); // 1.2s delay for a premium feel
         })
         .catch(() => {
             alert("SIGNAL LOST. CHECK CONNECTION.");
             btn.innerText = "INITIALIZE PROJECT";
+            btn.classList.remove('processing');
             btn.disabled = false;
         });
     });

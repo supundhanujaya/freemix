@@ -13,7 +13,7 @@
             box-sizing: border-box; transition: all 0.4s ease; border-radius: 28px;
         }
 
-        /* DUAL-SHAKE ANIMATION (NODE + INPUTS) */
+        /* DUAL-SHAKE ANIMATION */
         .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
 
@@ -32,27 +32,42 @@
         input::placeholder { color: #94a3b8; font-weight: 700; text-transform: uppercase; font-size: 10px; letter-spacing: 1px; }
         textarea { resize: vertical; text-transform: none; border-left: 3px solid #eee; min-height: 100px; }
 
-        /* SURGICAL VISUAL FEEDBACK */
         .is-invalid { border-color: #ef4444 !important; background: #fff8f8 !important; color: #ef4444 !important; }
         .is-valid { border-color: #3351d6 !important; background: #ffffff !important; color: #0f172a !important; }
 
         .error-label { display: none; font-size: 8px; color: #ef4444; font-weight: 800; letter-spacing: 1.2px; margin-top: 6px; padding-left: 5px; }
         .is-invalid + .error-label { display: block; }
 
+        /* BUTTON & PROGRESS BAR */
         .action-btn { 
-            background: #e2e8f0; color: #94a3b8; border: none; padding: 20px; font-size: 11px; font-weight: 800; 
+            position: relative; background: #e2e8f0; color: #94a3b8; border: none; padding: 20px; font-size: 11px; font-weight: 800; 
             letter-spacing: 3px; cursor: not-allowed; width: 100%; transition: all 0.4s ease; border-radius: 50px; text-transform: uppercase;
+            overflow: hidden; /* Clips the progress bar */
         }
         .action-btn.active { background: #0f172a; color: #fff; cursor: pointer; opacity: 1; }
         .action-btn.active:hover { background: #3351d6; transform: translateY(-2px); box-shadow: 0 12px 25px rgba(51, 81, 214, 0.25); }
 
-        /* PROCESSING & SUCCESS STATES */
-        .action-btn.processing { background: #64748b !important; color: #f1f5f9 !important; cursor: wait; opacity: 1; }
-        .action-btn.success { background: #10b981 !important; color: #ffffff !important; border-color: #10b981 !important; opacity: 1; }
+        .progress-bar {
+            position: absolute; left: 0; top: 0; height: 100%; width: 0%;
+            background: rgba(255, 255, 255, 0.15); transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .action-btn.processing { background: #0f172a !important; color: #fff !important; cursor: wait; opacity: 1; }
+        .action-btn.success { background: #10b981 !important; color: #ffffff !important; border-color: #10b981 !important; }
+
+        /* CHECKLIST STYLES */
+        #surgical-checklist-centered { width: 100%; margin: 30px auto 10px auto; text-align: center; color: #111; }
+        .mini-title { font-size: 10px; letter-spacing: 2.5px; color: #3351d6; font-weight: 900; text-transform: uppercase; display: block; margin-bottom: 15px; }
+        .slim-list { display: flex; flex-direction: column; align-items: center; gap: 6px; border-top: 1px solid #eee; padding-top: 12px; }
+        .slim-item { display: flex; justify-content: center; gap: 6px; font-size: 11px; line-height: 1.4; }
+        .slim-num { font-weight: 800; color: #3351d6; font-size: 9px; }
+        .slim-text b { color: #111; text-transform: uppercase; font-size: 10px; }
+        .slim-text span { color: #666; }
+        .mini-guarantee { margin-top: 12px; padding: 8px 0; border-top: 1px dashed #ddd; font-size: 11px; font-weight: 600; text-align: center; }
+        .highlight-val { color: #3351d6; font-weight: 800; }
 
         .instruction-text { font-size: 8px; letter-spacing: 1.5px; color: #94a3b8; margin-bottom: 18px; font-weight: 700; text-transform: uppercase; }
         #ui-success { display: none; padding: 50px 0; text-align: center; }
-        
         @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
     </style>
 </head>
@@ -79,8 +94,22 @@
                 </div>
                 <textarea id="mix-notes" placeholder="MIX NOTES / REFERENCES / INSTRUCTIONS" rows="4"></textarea>
             </div>
-            <p class="instruction-text">BOOK YOUR FREE MIX</p>
-            <button type="button" id="submit-btn" class="action-btn">BOOK</button>
+
+            <div id="surgical-checklist-centered">
+                <span class="mini-title">Pre-Session Requirements</span>
+                <div class="slim-list">
+                    <div class="slim-item"><span class="slim-num">01.</span><div class="slim-text"><b>Stems:</b> <span>Dry WAV/AIFF. Properly labeled.</span></div></div>
+                    <div class="slim-item"><span class="slim-num">02.</span><div class="slim-text"><b>Data:</b> <span>Include BPM & Key in notes.</span></div></div>
+                    <div class="slim-item"><span class="slim-num">03.</span><div class="slim-text"><b>Refs:</b> <span>Rough demo + Reference tracks.</span></div></div>
+                </div>
+                <div class="mini-guarantee"><span class="highlight-val">Worthy of a $220 full production.</span></div>
+            </div>
+
+            <p class="instruction-text" style="margin-top: 20px;">BOOK YOUR FREE MIX</p>
+            <button type="button" id="submit-btn" class="action-btn">
+                <div class="progress-bar" id="p-bar"></div>
+                <span id="btn-text">BOOK</span>
+            </button>
             <p id="system-error" style="display: none; font-size: 10px; color: #ef4444; font-weight: 800; margin-top: 15px; letter-spacing: 1px;">SYSTEM ERROR: CONNECTION LOST</p>
         </form>
     </div>
@@ -99,6 +128,8 @@
     const emailInput = document.getElementById('client-email');
     const linkInput = document.getElementById('stems-link');
     const btn = document.getElementById('submit-btn');
+    const btnText = document.getElementById('btn-text');
+    const pBar = document.getElementById('p-bar');
     const allInputs = document.querySelectorAll('input[required]');
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,6}$/;
@@ -107,76 +138,56 @@
     function runValidation() {
         const emailVal = emailInput.value.trim();
         const linkVal = linkInput.value.trim();
-
         const isEmailValid = emailRegex.test(emailVal);
         const isLinkValid = linkRegex.test(linkVal);
-        
-        // Visual Feedback for specific formats
+
         emailInput.classList.toggle('is-invalid', emailVal !== "" && !isEmailValid);
         emailInput.classList.toggle('is-valid', isEmailValid);
         linkInput.classList.toggle('is-invalid', linkVal !== "" && !isLinkValid);
         linkInput.classList.toggle('is-valid', isLinkValid);
 
-        // General check for all required fields
         let formReady = isEmailValid && isLinkValid;
         allInputs.forEach(i => { if(!i.value.trim()) formReady = false; });
-
-        if (formReady) {
-            btn.classList.add('active');
-        } else {
-            btn.classList.remove('active');
-        }
+        btn.classList.toggle('active', formReady);
     }
 
-// 1. ADD THIS: Clears the red "Error" state as soon as the user starts typing
-allInputs.forEach(input => {
-    input.addEventListener('input', () => {
-        // If the user starts typing, remove the error styling immediately
-        if (input.value.trim() !== "") {
-            input.classList.remove('is-invalid');
-            input.classList.remove('shake');
-        }
+    allInputs.forEach(input => {
+        input.addEventListener('input', () => {
+            if (input.value.trim() !== "") {
+                input.classList.remove('is-invalid');
+                input.classList.remove('shake');
+            }
+            runValidation();
+        });
     });
-});
-
-    document.getElementById('ui-form').addEventListener('input', runValidation);
 
     btn.addEventListener('click', () => {
-        // --- 1. FORCE VALIDATION ON CLICK ---
-        let hasError = false;
-
-        allInputs.forEach(input => {
-            const val = input.value.trim();
-            let invalid = false;
-
-            // Check if empty
-            if (!val) invalid = true;
-            // Check specific formats
-            if (input === emailInput && !emailRegex.test(val)) invalid = true;
-            if (input === linkInput && !linkRegex.test(val)) invalid = true;
-
-            if (invalid) {
-                input.classList.add('is-invalid');
-                // FORCE SHAKE ON FIELD
-                input.classList.remove('shake');
-                void input.offsetWidth; 
-                input.classList.add('shake');
-                hasError = true;
+        if(!btn.classList.contains('active')) {
+            let hasError = false;
+            allInputs.forEach(input => {
+                const val = input.value.trim();
+                let invalid = !val || (input === emailInput && !emailRegex.test(val)) || (input === linkInput && !linkRegex.test(val));
+                if (invalid) {
+                    input.classList.add('is-invalid');
+                    input.classList.remove('shake');
+                    void input.offsetWidth; 
+                    input.classList.add('shake');
+                    hasError = true;
+                }
+            });
+            if (hasError) {
+                node.classList.remove('shake');
+                void node.offsetWidth;
+                node.classList.add('shake');
+                return; 
             }
-        });
-
-        if (hasError) {
-            // FORCE SHAKE ON ENTIRE NODE
-            node.classList.remove('shake');
-            void node.offsetWidth;
-            node.classList.add('shake');
-            return; 
         }
 
-        // --- 2. PROCEED TO UPLINK ---
-        btn.innerText = "BOOKING PROJECT...";
+        // PROCEED
+        btnText.innerText = "BOOKING PROJECT...";
         btn.classList.add('processing');
         btn.disabled = true;
+        pBar.style.width = "100%"; // Trigger Progress Animation
 
         const data = {
             name: document.getElementById('client-name').value.trim(),
@@ -188,17 +199,20 @@ allInputs.forEach(input => {
 
         fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) })
         .then(() => {
-            btn.innerText = "PROJECT BOOKED!";
-            btn.classList.remove('processing');
-            btn.classList.add('success');
             setTimeout(() => {
-                document.getElementById('ui-container').style.display = 'none';
-                document.getElementById('ui-success').style.display = 'block';
+                btnText.innerText = "PROJECT BOOKED!";
+                btn.classList.remove('processing');
+                btn.classList.add('success');
+                setTimeout(() => {
+                    document.getElementById('ui-container').style.display = 'none';
+                    document.getElementById('ui-success').style.display = 'block';
+                }, 800);
             }, 1200);
         })
         .catch(() => {
-            btn.innerText = "RETRY INITIALIZE";
+            btnText.innerText = "RETRY INITIALIZE";
             btn.classList.remove('processing');
+            pBar.style.width = "0%";
             btn.disabled = false;
         });
     });

@@ -128,6 +128,17 @@
         }
     }
 
+// 1. ADD THIS: Clears the red "Error" state as soon as the user starts typing
+allInputs.forEach(input => {
+    input.addEventListener('input', () => {
+        // If the user starts typing, remove the error styling immediately
+        if (input.value.trim() !== "") {
+            input.classList.remove('is-invalid');
+            input.classList.remove('shake');
+        }
+    });
+});
+
     document.getElementById('ui-form').addEventListener('input', runValidation);
 
     btn.addEventListener('click', () => {

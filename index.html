@@ -7,50 +7,53 @@
         body { margin: 0; padding: 0; background: transparent; display: flex; justify-content: center; align-items: flex-start; font-family: 'Inter', -apple-system, sans-serif; }
         
         #surgical-upload-node { 
-            background: #ffffff; border: 1px solid #3351d6; padding: 40px; 
-            width: 95%; max-width: 420px; margin: 20px auto; 
-            text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,0.05);
-            box-sizing: border-box; transition: transform 0.3s ease;
+            background: #ffffff; border: 1px solid #e2e8f0; padding: 45px; 
+            width: 95%; max-width: 440px; margin: 30px auto; 
+            text-align: center; box-shadow: 0 30px 70px rgba(0,0,0,0.04);
+            box-sizing: border-box; transition: all 0.4s ease; border-radius: 28px;
         }
 
-        /* SHAKE ANIMATION FOR ERRORS */
+        /* DUAL-SHAKE ANIMATION (NODE + INPUTS) */
         .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
 
-        .node-header { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 30px; }
-        .signal-indicator { width: 6px; height: 6px; background: #9c27b0; border-radius: 50%; box-shadow: 0 0 10px #9c27b0; animation: pulse 1.5s infinite; }
-        .status-text { font-size: 10px; letter-spacing: 3px; color: #111; font-weight: 800; }
+        .node-header { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 35px; }
+        .signal-indicator { width: 7px; height: 7px; background: #9c27b0; border-radius: 50%; box-shadow: 0 0 12px #9c27b0; animation: pulse 1.5s infinite; }
+        .status-text { font-size: 10px; letter-spacing: 3px; color: #0f172a; font-weight: 800; text-transform: uppercase; }
         
-        .input-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
-        .field-wrap { position: relative; text-align: left; }
+        .input-group { display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; }
+        .field-wrap { position: relative; text-align: left; width: 100%; }
 
         input, textarea { 
-            width: 100%; padding: 12px; border: 1px solid #eee; font-size: 11px; letter-spacing: 1px; 
-            outline: none; transition: 0.3s; box-sizing: border-box; text-transform: uppercase;
+            width: 100%; padding: 15px; border: 1px solid #e2e8f0; font-size: 12px; font-weight: 500;
+            outline: none; transition: 0.3s cubic-bezier(0.2, 0, 0, 1); box-sizing: border-box; text-transform: uppercase; border-radius: 12px;
+            background: #f8fafc; color: #1e293b;
         }
-        textarea { resize: none; text-transform: none; border-left: 3px solid #eee; }
+        input::placeholder { color: #94a3b8; font-weight: 700; text-transform: uppercase; font-size: 10px; letter-spacing: 1px; }
+        textarea { resize: vertical; text-transform: none; border-left: 3px solid #eee; min-height: 100px; }
 
         /* SURGICAL VISUAL FEEDBACK */
-        .is-invalid { border: 1px solid #ff0000 !important; background: #fff8f8; }
-        .is-valid { border: 1px solid #3351d6 !important; }
+        .is-invalid { border-color: #ef4444 !important; background: #fff8f8 !important; color: #ef4444 !important; }
+        .is-valid { border-color: #3351d6 !important; background: #ffffff !important; color: #0f172a !important; }
 
-        .error-label { display: none; font-size: 8px; color: #ff0000; font-weight: 800; letter-spacing: 1px; margin-top: 4px; }
+        .error-label { display: none; font-size: 8px; color: #ef4444; font-weight: 800; letter-spacing: 1.2px; margin-top: 6px; padding-left: 5px; }
         .is-invalid + .error-label { display: block; }
 
         .action-btn { 
-            background: #ccc; color: #fff; border: none; padding: 18px; font-size: 11px; font-weight: 700; 
-            letter-spacing: 2px; cursor: not-allowed; width: 100%; transition: 0.4s; opacity: 0.5;
+            background: #e2e8f0; color: #94a3b8; border: none; padding: 20px; font-size: 11px; font-weight: 800; 
+            letter-spacing: 3px; cursor: not-allowed; width: 100%; transition: all 0.4s ease; border-radius: 50px; text-transform: uppercase;
         }
-        .action-btn.active { background: #111; opacity: 1; cursor: pointer; }
-        .action-btn.active:hover { background: #3351d6; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(51, 81, 214, 0.2); }
+        .action-btn.active { background: #0f172a; color: #fff; cursor: pointer; opacity: 1; }
+        .action-btn.active:hover { background: #3351d6; transform: translateY(-2px); box-shadow: 0 12px 25px rgba(51, 81, 214, 0.25); }
 
         /* PROCESSING & SUCCESS STATES */
-        .action-btn.processing { background: #444 !important; color: #888 !important; cursor: wait; opacity: 1; }
-        .action-btn.success { background: #00ff88 !important; color: #111 !important; border-color: #00ff88 !important; opacity: 1; }
+        .action-btn.processing { background: #64748b !important; color: #f1f5f9 !important; cursor: wait; opacity: 1; }
+        .action-btn.success { background: #10b981 !important; color: #ffffff !important; border-color: #10b981 !important; opacity: 1; }
 
-        .instruction-text { font-size: 8px; letter-spacing: 1px; color: #aaa; margin-bottom: 15px; font-weight: 600; }
-        #ui-success { display: none; padding: 20px 0; }
-        @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+        .instruction-text { font-size: 8px; letter-spacing: 1.5px; color: #94a3b8; margin-bottom: 18px; font-weight: 700; text-transform: uppercase; }
+        #ui-success { display: none; padding: 50px 0; text-align: center; }
+        
+        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -59,31 +62,33 @@
     <div id="ui-container">
         <div class="node-header">
             <span class="signal-indicator"></span>
-            <span class="status-text">SEND YOUR STEMS</span>
+            <span class="status-text">PROJECT UPLINK NODE</span>
         </div>
 
         <form id="ui-form" autocomplete="off">
             <div class="input-group">
                 <input type="text" id="client-name" placeholder="ARTIST NAME" required>
                 <div class="field-wrap">
-                    <input type="text" id="client-email" placeholder="EMAIL ADDRESS" required>
+                    <input type="email" id="client-email" placeholder="EMAIL ADDRESS" required>
                     <span class="error-label">STRICT FORMAT: NAME@DOMAIN.COM</span>
                 </div>
                 <input type="text" id="song-title" placeholder="SONG TITLE" required>
                 <div class="field-wrap">
                     <input type="text" id="stems-link" placeholder="PASTE STEMS LINK (HTTPS://...)" required>
-                    <span class="error-label">MUST START WITH HTTPS:// AND CONTAIN .DOMAIN</span>
+                    <span class="error-label">INVALID FORMAT: MUST START WITH HTTPS://</span>
                 </div>
                 <textarea id="mix-notes" placeholder="MIX NOTES / REFERENCES / INSTRUCTIONS" rows="4"></textarea>
             </div>
-            <p class="instruction-text">BOOK YOUR FREE MIX</p>
-            <button type="button" id="submit-btn" class="action-btn">BOOK</button>
+            <p class="instruction-text">UPLINK TEXT DATA TO STUDIO SERVER</p>
+            <button type="button" id="submit-btn" class="action-btn">INITIALIZE PROJECT</button>
+            <p id="system-error" style="display: none; font-size: 10px; color: #ef4444; font-weight: 800; margin-top: 15px; letter-spacing: 1px;">SYSTEM ERROR: CONNECTION LOST</p>
         </form>
     </div>
 
     <div id="ui-success">
-        <p style="color: #3351d6; font-weight: 800; letter-spacing: 2px;">PROJECT BOOKED!</p>
-        <p style="font-size: 11px; color: #666; margin-top: 10px;">Check your inbox. Supun has been notified.</p>
+        <div style="width: 14px; height: 14px; background: #10b981; border-radius: 50%; box-shadow: 0 0 25px rgba(16, 185, 129, 0.5); margin: 0 auto 30px auto; animation: pulse 2s infinite;"></div>
+        <p style="color: #0f172a; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; font-size: 11px;">SIGNAL RECEIVED</p>
+        <p style="font-size: 14px; color: #64748b; margin-top: 12px; line-height: 1.6; max-width: 320px; margin: 12px auto 0 auto;">Supun has been notified. Expect a primary technical audit within 24 hours.</p>
     </div>
 </div>
 
@@ -91,86 +96,99 @@
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyeFviQGb1xxacQ9rfyeGkJ7pmVKCip-gmvxVhE6O-h4H_q_4FUqeckdmDMwVxYT_1A/exec';
     
     const node = document.getElementById('surgical-upload-node');
-    const email = document.getElementById('client-email');
-    const link = document.getElementById('stems-link');
+    const emailInput = document.getElementById('client-email');
+    const linkInput = document.getElementById('stems-link');
     const btn = document.getElementById('submit-btn');
     const inputs = document.querySelectorAll('input[required]');
 
+    // Strict Validation RegEx
     const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,6}$/;
     const linkRegex = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
 
     function runValidation() {
-        const emailVal = email.value.trim();
-        const linkVal = link.value.trim();
+        const emailVal = emailInput.value.trim();
+        const linkVal = linkInput.value.trim();
 
         const isEmailValid = emailRegex.test(emailVal);
         const isLinkValid = linkRegex.test(linkVal);
         let allFilled = true;
         inputs.forEach(i => { if(!i.value.trim()) allFilled = false; });
 
-        email.classList.toggle('is-invalid', emailVal !== "" && !isEmailValid);
-        email.classList.toggle('is-valid', isEmailValid);
+        // Email Visual Feedback
+        emailInput.classList.toggle('is-invalid', emailVal !== "" && !isEmailValid);
+        emailInput.classList.toggle('is-valid', isEmailValid);
         
-        link.classList.toggle('is-invalid', linkVal !== "" && !isLinkValid);
-        link.classList.toggle('is-valid', isLinkValid);
+        // Link Visual Feedback
+        linkInput.classList.toggle('is-invalid', linkVal !== "" && !isLinkValid);
+        linkInput.classList.toggle('is-valid', isLinkValid);
 
+        // BUTTON ACTIVE STATE
         if (isEmailValid && isLinkValid && allFilled) {
             btn.classList.add('active');
-            btn.disabled = false;
+            btn.style.cursor = "pointer";
         } else {
             btn.classList.remove('active');
-            btn.disabled = true;
+            btn.style.cursor = "not-allowed";
         }
     }
 
     document.getElementById('ui-form').addEventListener('input', runValidation);
 
     btn.addEventListener('click', () => {
-    // If the button doesn't have the 'active' class, it means validation failed
-    if(!btn.classList.contains('active')) {
-        // Apply shake to the node
-        node.classList.remove('shake'); // Reset if already there
-        void node.offsetWidth; // Trigger reflow to restart animation
-        node.classList.add('shake');
-        
-        setTimeout(() => node.classList.remove('shake'), 400);
-        return;
-    }
+        // --- INVALID FORM HANDLING ---
+        if(!btn.classList.contains('active')) {
+            // TRIGGER MULTI-SHAKE (Node + Invalid Inputs)
+            node.classList.remove('shake');
+            void node.offsetWidth; // Force Reflow
+            node.classList.add('shake');
 
-    // --- START STATUS UPDATE LOGIC ---
-    btn.innerText = "INITIALIZING PROJECT...";
-    btn.classList.add('processing');
-    btn.classList.remove('active'); // Prevent double-clicks
-    
-    // We use a flag instead of .disabled to ensure styles remain consistent
-    const isProcessing = true; 
+            // Find all 'is-invalid' fields and shake them individually
+            const invalidFields = document.querySelectorAll('.is-invalid');
+            invalidFields.forEach(field => {
+                field.classList.remove('shake');
+                void field.offsetWidth; // Force Reflow
+                field.classList.add('shake');
+                setTimeout(() => field.classList.remove('shake'), 400); // Clean up
+            });
+            
+            setTimeout(() => node.classList.remove('shake'), 400); // Clean up Node
+            return;
+        }
 
-    const data = {
-        name: document.getElementById('client-name').value.trim(),
-        songTitle: document.getElementById('song-title').value.trim(),
-        clientEmail: email.value.trim(),
-        stemsLink: link.value.trim(),
-        clientNotes: document.getElementById('mix-notes').value
-    };
+        // --- VALID FORM SUBMISSION ---
+        btn.innerText = "UPLINKING SIGNAL...";
+        btn.classList.add('processing');
+        btn.classList.remove('active');
+        btn.disabled = true;
 
-    fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) })
-    .then(() => {
-        btn.innerText = "SIGNAL RECEIVED";
-        btn.classList.remove('processing');
-        btn.classList.add('success');
+        const data = {
+            name: document.getElementById('client-name').value.trim(),
+            songTitle: document.getElementById('song-title').value.trim(),
+            clientEmail: emailInput.value.trim(),
+            stemsLink: linkInput.value.trim(),
+            clientNotes: document.getElementById('mix-notes').value
+        };
 
-        setTimeout(() => {
-            document.getElementById('ui-container').style.display = 'none';
-            document.getElementById('ui-success').style.display = 'block';
-        }, 1200);
-    })
-    .catch(() => {
-        alert("SIGNAL LOST. CHECK CONNECTION.");
-        btn.innerText = "INITIALIZE PROJECT";
-        btn.classList.remove('processing');
-        btn.classList.add('active');
+        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) })
+        .then(() => {
+            // Processing State
+            btn.innerText = "SIGNAL RECEIVED";
+            btn.classList.remove('processing');
+            btn.classList.add('success');
+
+            setTimeout(() => {
+                document.getElementById('ui-container').style.display = 'none';
+                document.getElementById('ui-success').style.display = 'block';
+            }, 1200); // Delay for premium feel
+        })
+        .catch(() => {
+            document.getElementById('system-error').style.display = "block";
+            btn.innerText = "RETRY INITIALIZE";
+            btn.classList.remove('processing');
+            btn.classList.add('active');
+            btn.disabled = false;
+        });
     });
-});
 </script>
 </body>
 </html>

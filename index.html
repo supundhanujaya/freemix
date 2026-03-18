@@ -69,7 +69,23 @@
         .instruction-text { font-size: 8px; letter-spacing: 1.5px; color: #94a3b8; margin-bottom: 18px; font-weight: 700; text-transform: uppercase; }
         #ui-success { display: none; padding: 50px 0; text-align: center; }
         @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
-    </style>
+        /* ADD THIS ANIMATION FOR THE DOTS */
+.dots::after {
+  content: '';
+  display: inline-block;
+  width: 12px; /* Prevents text jumping */
+  text-align: left;
+  animation: dot-cycle 1.5s steps(4, end) infinite;
+}
+
+@keyframes dot-cycle {
+  0%   { content: ''; }
+  25%  { content: '.'; }
+  50%  { content: '..'; }
+  75%  { content: '...'; }
+  100% { content: ''; }
+}
+</style>
 </head>
 <body>
 
@@ -183,11 +199,12 @@
             }
         }
 
-        // PROCEED
-        btnText.innerText = "BOOKING PROJECT...";
+        // --- START ANIMATED UPLINK ---
+        // This line adds the span that cycles the dots
+        btnText.innerHTML = 'BOOKING PROJECT<span class="dots"></span>';
         btn.classList.add('processing');
         btn.disabled = true;
-        pBar.style.width = "100%"; // Trigger Progress Animation
+        pBar.style.width = "100%"; 
 
         const data = {
             name: document.getElementById('client-name').value.trim(),
@@ -197,17 +214,25 @@
             clientNotes: document.getElementById('mix-notes').value
         };
 
+        const startTime = Date.now();
+
         fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) })
         .then(() => {
+            const elapsedTime = Date.now() - startTime;
+            // Matches your progress bar duration (3s) plus a small buffer
+            const remainingTime = Math.max(0, 3200 - elapsedTime); 
+
             setTimeout(() => {
-                btnText.innerText = "PROJECT BOOKED!";
+                btnText.innerHTML = "PROJECT BOOKED!"; // Resets to plain text
                 btn.classList.remove('processing');
                 btn.classList.add('success');
+                
                 setTimeout(() => {
                     document.getElementById('ui-container').style.display = 'none';
                     document.getElementById('ui-success').style.display = 'block';
-                }, 800);
-            }, 1200);
+                }, 800); 
+                
+            }, remainingTime); 
         })
         .catch(() => {
             btnText.innerText = "RETRY INITIALIZE";

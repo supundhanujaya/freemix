@@ -59,7 +59,7 @@
     <div id="ui-container">
         <div class="node-header">
             <span class="signal-indicator"></span>
-            <span class="status-text">PROJECT UPLINK NODE</span>
+            <span class="status-text">SEND YOUR STEMS</span>
         </div>
 
         <form id="ui-form" autocomplete="off">
@@ -76,8 +76,8 @@
                 </div>
                 <textarea id="mix-notes" placeholder="MIX NOTES / REFERENCES / INSTRUCTIONS" rows="4"></textarea>
             </div>
-            <p class="instruction-text">UPLINK TEXT DATA TO STUDIO SERVER</p>
-            <button type="button" id="submit-btn" class="action-btn" disabled>INITIALIZE PROJECT</button>
+            <p class="instruction-text">BOOK YOUR FREE MIX</p>
+            <button type="button" id="submit-btn" class="action-btn">BOOK</button>
         </form>
     </div>
 
@@ -126,44 +126,51 @@
     document.getElementById('ui-form').addEventListener('input', runValidation);
 
     btn.addEventListener('click', () => {
-        if(btn.disabled) {
-            node.classList.add('shake');
-            setTimeout(() => node.classList.remove('shake'), 400);
-            return;
-        }
+    // If the button doesn't have the 'active' class, it means validation failed
+    if(!btn.classList.contains('active')) {
+        // Apply shake to the node
+        node.classList.remove('shake'); // Reset if already there
+        void node.offsetWidth; // Trigger reflow to restart animation
+        node.classList.add('shake');
+        
+        setTimeout(() => node.classList.remove('shake'), 400);
+        return;
+    }
 
-        // --- START STATUS UPDATE LOGIC ---
-        btn.innerText = "UPLINKING SIGNAL...";
-        btn.classList.add('processing');
-        btn.disabled = true;
+    // --- START STATUS UPDATE LOGIC ---
+    btn.innerText = "UPLINKING SIGNAL...";
+    btn.classList.add('processing');
+    btn.classList.remove('active'); // Prevent double-clicks
+    
+    // We use a flag instead of .disabled to ensure styles remain consistent
+    const isProcessing = true; 
 
-        const data = {
-            name: document.getElementById('client-name').value.trim(),
-            songTitle: document.getElementById('song-title').value.trim(),
-            clientEmail: email.value.trim(),
-            stemsLink: link.value.trim(),
-            clientNotes: document.getElementById('mix-notes').value
-        };
+    const data = {
+        name: document.getElementById('client-name').value.trim(),
+        songTitle: document.getElementById('song-title').value.trim(),
+        clientEmail: email.value.trim(),
+        stemsLink: link.value.trim(),
+        clientNotes: document.getElementById('mix-notes').value
+    };
 
-        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) })
-        .then(() => {
-            // Update button to success state before switching screens
-            btn.innerText = "SIGNAL RECEIVED";
-            btn.classList.remove('processing');
-            btn.classList.add('success');
+    fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) })
+    .then(() => {
+        btn.innerText = "SIGNAL RECEIVED";
+        btn.classList.remove('processing');
+        btn.classList.add('success');
 
-            setTimeout(() => {
-                document.getElementById('ui-container').style.display = 'none';
-                document.getElementById('ui-success').style.display = 'block';
-            }, 1200); // 1.2s delay for a premium feel
-        })
-        .catch(() => {
-            alert("SIGNAL LOST. CHECK CONNECTION.");
-            btn.innerText = "INITIALIZE PROJECT";
-            btn.classList.remove('processing');
-            btn.disabled = false;
-        });
+        setTimeout(() => {
+            document.getElementById('ui-container').style.display = 'none';
+            document.getElementById('ui-success').style.display = 'block';
+        }, 1200);
+    })
+    .catch(() => {
+        alert("SIGNAL LOST. CHECK CONNECTION.");
+        btn.innerText = "INITIALIZE PROJECT";
+        btn.classList.remove('processing');
+        btn.classList.add('active');
     });
+});
 </script>
 </body>
 </html>

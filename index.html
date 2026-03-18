@@ -62,7 +62,7 @@
     <div id="ui-container">
         <div class="node-header">
             <span class="signal-indicator"></span>
-            <span class="status-text">PROJECT UPLINK NODE</span>
+            <span class="status-text">SEND YOUR STEMS</span>
         </div>
 
         <form id="ui-form" autocomplete="off">
@@ -79,16 +79,16 @@
                 </div>
                 <textarea id="mix-notes" placeholder="MIX NOTES / REFERENCES / INSTRUCTIONS" rows="4"></textarea>
             </div>
-            <p class="instruction-text">UPLINK TEXT DATA TO STUDIO SERVER</p>
-            <button type="button" id="submit-btn" class="action-btn">INITIALIZE PROJECT</button>
+            <p class="instruction-text">BOOK YOUR FREE MIX</p>
+            <button type="button" id="submit-btn" class="action-btn">BOOK</button>
             <p id="system-error" style="display: none; font-size: 10px; color: #ef4444; font-weight: 800; margin-top: 15px; letter-spacing: 1px;">SYSTEM ERROR: CONNECTION LOST</p>
         </form>
     </div>
 
     <div id="ui-success">
         <div style="width: 14px; height: 14px; background: #10b981; border-radius: 50%; box-shadow: 0 0 25px rgba(16, 185, 129, 0.5); margin: 0 auto 30px auto; animation: pulse 2s infinite;"></div>
-        <p style="color: #0f172a; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; font-size: 11px;">SIGNAL RECEIVED</p>
-        <p style="font-size: 14px; color: #64748b; margin-top: 12px; line-height: 1.6; max-width: 320px; margin: 12px auto 0 auto;">Supun has been notified. Expect a primary technical audit within 24 hours.</p>
+        <p style="color: #0f172a; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; font-size: 11px;">PROJECT BOOKED!</p>
+        <p style="font-size: 14px; color: #64748b; margin-top: 12px; line-height: 1.6; max-width: 320px; margin: 12px auto 0 auto;">Check your inbox. Supun has been notified.</p>
     </div>
 </div>
 
@@ -174,7 +174,7 @@ allInputs.forEach(input => {
         }
 
         // --- 2. PROCEED TO UPLINK ---
-        btn.innerText = "UPLINKING SIGNAL...";
+        btn.innerText = "BOOKING PROJECT...";
         btn.classList.add('processing');
         btn.disabled = true;
 
@@ -188,7 +188,7 @@ allInputs.forEach(input => {
 
         fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) })
         .then(() => {
-            btn.innerText = "SIGNAL RECEIVED";
+            btn.innerText = "PROJECT BOOKED!";
             btn.classList.remove('processing');
             btn.classList.add('success');
             setTimeout(() => {
